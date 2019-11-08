@@ -1,4 +1,5 @@
 const { app, BrowserWindow } = require('electron')
+const path = require('path')
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -14,8 +15,9 @@ function createWindow () {
     }
   })
 
+  const htmlPath = path.join('src','index.html')
   // and load the index.html of the app.
-  win.loadFile('index.html')
+  win.loadFile(htmlPath)
 
   // Open the DevTools.
   win.webContents.openDevTools()
@@ -33,6 +35,7 @@ function createWindow () {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', createWindow)
+
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
@@ -53,22 +56,3 @@ app.on('activate', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
-
-const {ipcMain}     	= require('electron'); // include the ipc module to communicate with render process ie to receive the message from render process
- 
-//ipcMain.on will receive the “btnclick” info from renderprocess 
-ipcMain.on("btnclick",function (event, arg) {
-        //create new window
-        var newWindow        = new BrowserWindow({ width: 450, height: 300, show: 
-                                              false,webPreferences: {webSecurity: false,plugins:
-                                              true,nodeIntegration: false} });  // create a new window
- 
-        var facebookURL     =  "https://www.facebook.com"; // loading an external url. We canload our own another html file , like how we load index.html earlier
- 
-        newWindow.loadURL(facebookURL);
-        newWindow.show();
- 
-       // inform the render process that the assigned task finished. Show a message in html
-      // event.sender.send in ipcMain will return the reply to renderprocess
-       event.sender.send("btnclick-task-finished", "yes"); 
-});
