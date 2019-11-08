@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Hello World!</title>
+    <!-- https://electronjs.org/docs/tutorial/security#csp-meta-tag -->
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+  </head>
+  <main class="content-wraper" id="content-wraper">
+    <div class="content-blk">
+    Helo.. This is my first desktop app    <button id="loadnewwindow">click to load new window</button>
+         <div id=”message”></div>
+    </div>
+</main>
+
+
+ 
+<script>
+ 
+ const ipcRenderer = require('electron').ipcRenderer; 
+     
+    const btnclick = document.getElementById('loadnewwindow');
+    btnclick.addEventListener('click', function () {
+        var arg ="secondparam";
+     
+       //send the info to main process . we can pass any arguments as second param.
+        ipcRenderer.send("btnclick", arg); // ipcRender.send will pass the information to main process
+    });
+
+
+//ipcRenderer.on will receive the “btnclick-task-finished'” info from main process 
+ ipcRenderer.on('btnclick-task-finished', function(event,param) {
+    document.getElementById('message').innerHTML('loaded a popup');      //show message . Here we can use jquery                                        
+ });
+ 
+</script>
