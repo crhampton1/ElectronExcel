@@ -1,0 +1,11 @@
+{
+  "name": "electronexcel",
+  "version": "0.0.1",
+  "description": "An app for parsing excel to csv.",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
