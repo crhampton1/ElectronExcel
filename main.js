@@ -9,6 +9,7 @@ const excelToJson = require('convert-excel-to-json');
 // be closed automatically when the JavaScript object is garbage collected.
 let win
 const stat = util.promisify(fs.stat)
+const DoTheExcel = util.promisify(excelToJson)
 
 function createWindow () {
   // Create the browser window.
@@ -66,8 +67,7 @@ ipcMain.on('files', async (event, filesArr) => {
   try{
     const data = await Promise.all(
       filesArr.map(async({ name, pathName })=> ({
-        ...await  excelToJson({ source: fs.readFileSync(pathName) // fs.readFileSync return a Buffer
-      })
+        ...await  handleExcel(pathName)
       }))
     )
     win.webContents.send('metadata', data)
@@ -75,3 +75,22 @@ ipcMain.on('files', async (event, filesArr) => {
     win.webContents.send('metadata:error', error)
   }
 })
+
+async function handleExcel(pathName){
+  var pathT = pathName
+  try{
+    const data = new Promise(function(resolve, reject){
+      console.log(pathT)
+      var tstT =  DoTheExcel({
+        sourceFile: pathT
+    }).then(
+      resolve (console.log(tstT))
+    )
+    
+    })
+
+  } catch(error){
+      throw error;
+    }
+
+}
