@@ -8,6 +8,23 @@
     </head>
     <body>
         <h1 style="text-align: center;">Electron Excel Manipulation</h1>
+        <form>
+            <div>
+                <label for="filepicker">
+                <input 
+                    id="filePicker"
+                    name="filpicker"
+                    type="file"
+                    >
+                </label>
+            </div>
+            <button>Get Metadata</button>
+        </form>
+        
+
+        <hr />
+
+        <pre id="data"></pre>
 
 
         <script src="./renderer.js"></script>
