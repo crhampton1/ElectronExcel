@@ -13,8 +13,10 @@
     "electron": "^7.1.1"
   },
   "dependencies": {
+    "convert-array-to-csv": "^1.0.9",
     "convert-excel-to-json": "^1.6.1",
     "excel-to-json": "^1.0.0",
+    "json2csv": "^4.5.4",
     "path": "^0.12.7",
     "xlsx": "^0.15.1"
   }

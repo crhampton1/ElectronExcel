@@ -3,6 +3,8 @@ const path = require('path')
 const util = require('util')
 const fs = require('fs')
 const excelToJson = require('convert-excel-to-json');
+const { Parser } = require('json2csv');
+const { convertArrayToCSV } = require('convert-array-to-csv');
 
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -89,14 +91,24 @@ async function DoTheExcelFunction(pathName) {
         })
     
    
-    var data = []
-    
-     
+    var data2 = []
+    const fields = ['Church', 'Organization', 'People', 'Title', 'AccountLongName', 'CurrentValue', 'LastYearValue', 'InvestmentType']
+    const json2csvParser = new Parser({ fields });
+   
+    var i = 0;
+    console.log(JsonConverted.ReportData.length) 
+
+
     for await (eachField of JsonConverted.ReportData){
       var newObject = {
         Church: '',
         Organization: '',
-        People: ''
+        People: '',
+        Title: eachField.Title,
+        AccountLongName: '',
+        CurrentValue: eachField.CurrentValue,	
+        LastYearValue: eachField.LastYearValue,
+        InvestmentType: eachField.InvestmentType
       }
       
 
@@ -107,19 +119,31 @@ async function DoTheExcelFunction(pathName) {
       } else if (eachField.Id.includes('I')){
         newObject.People = eachField.Id.substring(0, eachField.Id.length -1) 
       } else {
-        console.log("NULL")
-        
+        console.error("NULL")
       }
 
-      data.push(newObject)
+      if((eachField.AccountLongName2 != null && eachField.AccountLongName3 != null) || (eachField.AccountLongName2 != undefined && eachField.AccountLongName3 != undefined)){
+        newObject.AccountLongName = eachField.AccountLongName + ' ' + eachField.AccountLongName2 + ' ' + eachField.AccountLongName3
+      } else if ((eachField.AccountLongName2 != null && eachField.AccountLongName3 == null) || (eachField.AccountLongName2 != undefined && eachField.AccountLongName3 == undefined)){
+        newObject.AccountLongName = eachField.AccountLongName + ' ' + eachField.AccountLongName2
+      } else {
+        newObject.AccountLongName = eachField.AccountLongName
+      }
+      
+      data2.push(newObject)
     }
    
-    var bigData = {data}
+    //var bigData = {data}
 
-    
-    return bigData
+    //const csv = await json2csvParser.parse(JSON.parse(JSON.stringify(data2)));
+    const csvFromArrayOfObjects = await convertArrayToCSV(data2);
+    console.log(csvFromArrayOfObjects)
+
+    try { fs.writeFileSync('myfile.txt', data2,); }
+    catch(e) { alert('Failed to save the file !'); }
+    return data2
 
   } catch (error) {
-    win.webContents.send('metadata:error', error)
+    win.webContents.send('metadata:error', error.message)
   }
 } 
