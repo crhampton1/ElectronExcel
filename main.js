@@ -66,8 +66,8 @@ app.on('activate', () => {
 ipcMain.on('files', async (event, filesArr) => {
   try{
     const data = await Promise.all(
-      filesArr.map(async({ name, pathName })=> ({
-        ...await  handleExcel(pathName)
+      filesArr.map(async({pathName })=> ({
+        ...await  DoTheExcelFunction(pathName)
       }))
     )
     win.webContents.send('metadata', data)
@@ -76,21 +76,50 @@ ipcMain.on('files', async (event, filesArr) => {
   }
 })
 
-async function handleExcel(pathName){
-  var pathT = pathName
-  try{
-    const data = new Promise(function(resolve, reject){
-      console.log(pathT)
-      var tstT =  DoTheExcel({
-        sourceFile: pathT
-    }).then(
-      resolve (console.log(tstT))
-    )
+async function DoTheExcelFunction(pathName) {
+  try {
+   var JsonConverted = await excelToJson({
+          source: fs.readFileSync(pathName),
+          header:{
+            rows: 1
+        },
+          columnToKey: {
+            '*': '{{columnHeader}}'
+          } 
+        })
     
-    })
+   
+    var data = []
+    
+     
+    for await (eachField of JsonConverted.ReportData){
+      var newObject = {
+        Church: '',
+        Organization: '',
+        People: ''
+      }
+      
 
-  } catch(error){
-      throw error;
+      if(eachField.Id.includes('C')){
+        newObject.Church = eachField.Id.substring(0, eachField.Id.length -1) 
+      } else if (eachField.Id.includes('O')){
+        newObject.Organization = eachField.Id.substring(0, eachField.Id.length -1) 
+      } else if (eachField.Id.includes('I')){
+        newObject.People = eachField.Id.substring(0, eachField.Id.length -1) 
+      } else {
+        console.log("NULL")
+        
+      }
+
+      data.push(newObject)
     }
+   
+    var bigData = {data}
 
-}
+    
+    return bigData
+
+  } catch (error) {
+    win.webContents.send('metadata:error', error)
+  }
+} 
