@@ -1,6 +1,6 @@
 const {ipcRenderer} = require('electron')
 var electron = require('electron').remote;
-var XLSX = require('xlsx');
+
 
 
 

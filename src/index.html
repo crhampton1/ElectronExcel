@@ -1,25 +1,43 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="utf-8" />
-        <Title>Electron Excel</Title>
-        <meta name="viewport" content="width=devicewidth, initital-scale=1">
-        <link rel="styleshet" href="./style.css">
+        <Title>FIS TO BR</Title>
+         <meta charset="UTF-8">
+         <meta name="viewport" content="width=device-width,initial-scale=1">
+        <link rel="stylesheet" type="text/css" href="../node_modules/bootstrap/dist/css/bootstrap.css">
+        <link rel="stylesheet" type="text/css" href="./style.css">
     </head>
     <body>
-        <h1 style="text-align: center;">Electron Excel Manipulation</h1>
-        <form>
-            <div>
-                <label for="filepicker">
-                <input 
-                    id="filePicker"
-                    name="filpicker"
-                    type="file"
-                    >
-                </label>
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-12">
+                        <h1 class="text-center text-primary">FIS To BrickRiver</h1>
+                </div>
+                    
             </div>
-            <button>Get Metadata</button>
-        </form>
+            <div class="row text-center">
+                <div class="col-sm-12">
+                    <form >
+                            <div>
+                                <label for="filepicker" >
+                                <input 
+                                    id="filePicker"
+                                    name="filpicker"
+                                    type="file"
+                                    class="form-control-file"
+                                    >
+                                   
+                            <button id="image_alt" type="button">Choose file</button>
+                                </label>
+                                
+                            </div>
+                            <button class="btn btn-primary">Run the Magic</button>
+                        </form>
+                    </div>
+            </div>
+        </div>
+        
+      
         
 
         <hr />
@@ -28,5 +46,20 @@
 
 
         <script src="./renderer.js"></script>
+        <script>
+         window.$ = window.jquery = require("jquery");
+        window.popper = require("popper.js");
+        require("bootstrap");
+
+        $(document).ready(function(){
+           
+
+  $('#image_alt').click(function () {
+      $('#image_alt').hide();
+      $('#filePicker').show();
+     $('#filePicker').click();
+  });
+});
+        </script>
     </body>
 </html>
