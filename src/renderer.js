@@ -18,10 +18,10 @@ const submitListner = document
         ipcRenderer.send('files', filesFormated)
     })
 
-    ipcRenderer.on('metadata', (event, metadata) => {
+    ipcRenderer.on('metadata', (event, response) => {
         const pre = document.getElementById('data')
 
-        pre.innerText = JSON.stringify(metadata, null, 2) 
+        pre.innerText = response 
     })
 
     ipcRenderer.on('metadata:error', (event, error) => {

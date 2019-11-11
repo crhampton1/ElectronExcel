@@ -97,7 +97,7 @@ async function DoTheExcelFunction(pathName) {
     const json2csvParser = new Parser({ fields });
    
     var i = 0;
-    console.log(JsonConverted.ReportData.length) 
+    
 
 
     for await (eachField of JsonConverted.ReportData){
@@ -152,7 +152,7 @@ async function DoTheExcelFunction(pathName) {
     
     console.log(response);
 
-    return data2
+    return response.body
 
   } catch (error) {
     win.webContents.send('metadata:error', error.message)
