@@ -5,13 +5,14 @@ const fs = require('fs')
 const excelToJson = require('convert-excel-to-json');
 const { Parser } = require('json2csv');
 const { convertArrayToCSV } = require('convert-array-to-csv');
+const request = require('request')
 
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win
-const stat = util.promisify(fs.stat)
-const DoTheExcel = util.promisify(excelToJson)
+const requestsPromise = util.promisify(request.post)
+
 
 function createWindow () {
   // Create the browser window.
@@ -92,7 +93,7 @@ async function DoTheExcelFunction(pathName) {
     
    
     var data2 = []
-    const fields = ['Church', 'Organization', 'People', 'Title', 'AccountLongName', 'CurrentValue', 'LastYearValue', 'InvestmentType']
+    const fields = ['Church', 'Organizations', 'People', 'Title', 'AccountLongName', 'CurrentValue', 'LastYearValue', 'InvestmentType']
     const json2csvParser = new Parser({ fields });
    
     var i = 0;
@@ -102,7 +103,7 @@ async function DoTheExcelFunction(pathName) {
     for await (eachField of JsonConverted.ReportData){
       var newObject = {
         Church: '',
-        Organization: '',
+        Organizations: '',
         People: '',
         Title: eachField.Title,
         AccountLongName: '',
@@ -115,7 +116,7 @@ async function DoTheExcelFunction(pathName) {
       if(eachField.Id.includes('C')){
         newObject.Church = eachField.Id.substring(0, eachField.Id.length -1) 
       } else if (eachField.Id.includes('O')){
-        newObject.Organization = eachField.Id.substring(0, eachField.Id.length -1) 
+        newObject.Organizations = eachField.Id.substring(0, eachField.Id.length -1) 
       } else if (eachField.Id.includes('I')){
         newObject.People = eachField.Id.substring(0, eachField.Id.length -1) 
       } else {
@@ -137,10 +138,20 @@ async function DoTheExcelFunction(pathName) {
 
     //const csv = await json2csvParser.parse(JSON.parse(JSON.stringify(data2)));
     const csvFromArrayOfObjects = await convertArrayToCSV(data2);
-    console.log(csvFromArrayOfObjects)
+    //console.log(csvFromArrayOfObjects)
 
-    try { fs.writeFileSync('myfile.txt', data2,); }
-    catch(e) { alert('Failed to save the file !'); }
+    fs.writeFileSync('toUpload.csv', csvFromArrayOfObjects); 
+
+    const formData = {
+      my_file: fs.createReadStream('toUpload.csv'),
+    }
+
+   
+    const response = await requestsPromise({url:'https://wnc-data.brtapp.com/import/31f96c453b2948a195c984a98fb7f302/foundationaccounts.csv', formData: formData})
+
+    
+    console.log(response);
+
     return data2
 
   } catch (error) {
