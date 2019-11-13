@@ -1,6 +1,6 @@
 const {ipcRenderer} = require('electron')
 var electron = require('electron').remote;
-
+var log = require("electron-log");
 
 
 
@@ -14,18 +14,22 @@ const submitListner = document
             name,
             pathName
         }))
-        console.log(filesFormated)
+        log.log(filesFormated)
         ipcRenderer.send('files', filesFormated)
     })
 
     ipcRenderer.on('metadata', (event, response) => {
         const pre = document.getElementById('data')
 
-        pre.innerText = response 
+       pre.innerText = response[0].body 
+        log.info(response[0].body)
     })
 
     ipcRenderer.on('metadata:error', (event, error) => {
-        console.error(error)
+        const pre = document.getElementById('data')
+
+        pre.innerText = "Error: " + error
+        log.error("Renderer" + error)
     });
 
     

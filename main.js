@@ -3,9 +3,12 @@ const path = require('path')
 const util = require('util')
 const fs = require('fs')
 const excelToJson = require('convert-excel-to-json');
+const log = require('electron-log');
 
 const { convertArrayToCSV } = require('convert-array-to-csv');
 const request = require('request')
+const Readable = require('stream').Readable;
+
 
 
 
@@ -28,7 +31,7 @@ function createWindow () {
   win.loadFile(htmlPath)
 
 
-  //win.webContents.openDevTools()
+  win.webContents.openDevTools()
 
 
   win.on('closed', () => {
@@ -59,6 +62,10 @@ app.on('activate', () => {
 
 ipcMain.on('files', async (event, filesArr) => {
   try{
+
+
+
+
     const data = await Promise.all(
       filesArr.map(async({pathName })=> ({
         ...await  DoTheExcelFunction(pathName)
@@ -72,6 +79,12 @@ ipcMain.on('files', async (event, filesArr) => {
 
 async function DoTheExcelFunction(pathName) {
   try {
+    
+    var fileExtension = pathName.substring(pathName.length - 7).split('.')
+    if( fileExtension[1] != "xls" && fileExtension[1] != "xlsx"){
+      throw new Error("Wrong file type!");
+    }
+
    var JsonConverted = await excelToJson({
           source: fs.readFileSync(pathName),
           header:{
@@ -109,7 +122,9 @@ async function DoTheExcelFunction(pathName) {
       } else if (eachField.Id.includes('I')){
         newObject.People = eachField.Id.substring(0, eachField.Id.length -1) 
       } else {
-        console.error("NULL")
+        
+        log.error("Missing C - O - I");
+        throw new Error('Missing C - O - I');
       }
 
       if((eachField.AccountLongName2 != null && eachField.AccountLongName3 != null) || (eachField.AccountLongName2 != undefined && eachField.AccountLongName3 != undefined)){
@@ -125,23 +140,42 @@ async function DoTheExcelFunction(pathName) {
    
    
     const csvFromArrayOfObjects = await convertArrayToCSV(data2);
- 
+    
+    const s = new Readable({
+      encoding: 'utf8',
+      read(size) {
+        // Possibly respect the requested size to make for a good consumer experience
+        // Otherwise:
+        this.push(csvFromArrayOfObjects, 'utf8');
+        this.push(null); // This signals that there's no more data.
+      }
+    });
 
     fs.writeFileSync('toUpload.csv', csvFromArrayOfObjects); 
 
+    //log.silly(s)
+    //log.warn(fs.createReadStream('toUpload.csv'))
+
     const formData = {
-      my_file: fs.createReadStream('toUpload.csv'),
+      file: {
+        value: s,
+        options: {
+          contentType: 'text/csv; charset=utf-8',
+          filename: 'dummy.csv'
+        }
+      }
+
     }
 
    
     const response = await requestsPromise({url:'https://wnc-data.brtapp.com/import/31f96c453b2948a195c984a98fb7f302/foundationaccounts.csv', formData: formData})
 
     
-    console.log(response);
 
-    return response.body
+    return response
 
   } catch (error) {
-    win.webContents.send('metadata:error', error.message)
+    win.webContents.send('metadata:error', error)
+    log.error(error.message)
   }
 } 
