@@ -5,9 +5,9 @@ const fs = require('fs')
 const excelToJson = require('convert-excel-to-json');
 const log = require('electron-log');
 
+
 const { convertArrayToCSV } = require('convert-array-to-csv');
 const request = require('request')
-const Readable = require('stream').Readable;
 
 
 
@@ -140,31 +140,14 @@ async function DoTheExcelFunction(pathName) {
    
    
     const csvFromArrayOfObjects = await convertArrayToCSV(data2);
-    
-    const s = new Readable({
-      encoding: 'utf8',
-      read(size) {
-        // Possibly respect the requested size to make for a good consumer experience
-        // Otherwise:
-        this.push(csvFromArrayOfObjects, 'utf8');
-        this.push(null); // This signals that there's no more data.
-      }
-    });
+   
 
-    fs.writeFileSync('toUpload.csv', csvFromArrayOfObjects); 
+   fs.writeFileSync('toUpload.csv', csvFromArrayOfObjects); 
+ 
 
-    //log.silly(s)
-    //log.warn(fs.createReadStream('toUpload.csv'))
 
     const formData = {
-      file: {
-        value: s,
-        options: {
-          contentType: 'text/csv; charset=utf-8',
-          filename: 'dummy.csv'
-        }
-      }
-
+        my_file:  fs.createReadStream('toUpload.csv')
     }
 
    
@@ -176,6 +159,6 @@ async function DoTheExcelFunction(pathName) {
 
   } catch (error) {
     win.webContents.send('metadata:error', error)
-    log.error(error.message)
+    log.error(error)
   }
 } 
