@@ -6,6 +6,7 @@ const excelToJson = require('convert-excel-to-json');
 const log = require('electron-log');
 
 
+
 const { convertArrayToCSV } = require('convert-array-to-csv');
 const request = require('request')
 
@@ -140,19 +141,22 @@ async function DoTheExcelFunction(pathName) {
    
    
     const csvFromArrayOfObjects = await convertArrayToCSV(data2);
+  
+    var buf = Buffer.from(csvFromArrayOfObjects, 'utf8')
    
 
-   fs.writeFileSync('toUpload.csv', csvFromArrayOfObjects); 
- 
-
-
-    const formData = {
-        my_file:  fs.createReadStream('toUpload.csv')
+    var formData = {
+      'file': {
+        value: buf,
+        options: {
+          filename: 'upload',
+          contentType: 'text/csv'
+        }
+      }
     }
 
    
     const response = await requestsPromise({url:'https://wnc-data.brtapp.com/import/31f96c453b2948a195c984a98fb7f302/foundationaccounts.csv', formData: formData})
-
     
 
     return response
