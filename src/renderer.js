@@ -21,7 +21,7 @@ const submitListner = document
     ipcRenderer.on('metadata', (event, response) => {
         const pre = document.getElementById('data')
 
-       pre.innerText = response[0].body.replace('<') 
+       pre.innerText = response[0].body.replace('<jobId>') 
         log.info(response[0].body)
     })
 

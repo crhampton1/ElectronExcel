@@ -4,6 +4,7 @@ const util = require('util')
 const fs = require('fs')
 const excelToJson = require('convert-excel-to-json');
 const log = require('electron-log');
+const { autoUpdater } = require("")
 
 
 
