@@ -21,7 +21,7 @@
     "electron-builder": "^22.1.0",
     "electron-installer-windows": "^2.0.0",
     "electron-log": "^3.0.9",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "path": "^0.12.7",
     "popper.js": "^1.16.0",
     "request": "^2.88.0"
